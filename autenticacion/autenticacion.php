@@ -1,0 +1,19 @@
+<?php
+    require '../config/pdo.php';
+    
+    session_start();
+
+    function comprobarAutenticacion() {
+        if (!isset($_SESSION['usuario'])) {
+            return false;
+        }
+        return true;
+    }
+    
+    function comprobarRole($role) {
+        if (!isset($_SESSION['role']) || $_SESSION['role'] !== $role) {
+            header("Location: ../autenticacion/no-autenticado.php");
+            exit();
+        }
+    }
+?>
