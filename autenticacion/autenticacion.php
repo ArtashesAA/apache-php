@@ -4,7 +4,7 @@
     session_start();
 
     function comprobarAutenticacion() {
-        if (!isset($_SESSION['usuario'])) {
+        if (!isset($_SESSION['username'])) {
             return false;
         }
         return true;

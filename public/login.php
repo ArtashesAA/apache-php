@@ -1,56 +1,47 @@
 <?php
 require '../config/conexion.php';
+require '../config/database.php';
 
 $error = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Obtener y sanitizar las credenciales del formulario
     $username = htmlspecialchars($_POST['username']);
-    $password = htmlspecialchars($_POST['password']);
-    $role = htmlspecialchars($_POST['role']);
+    $password = $_POST['password'];
 
     // Verificar si el usuario existe
     if (!userExiste($username)) {
-        header('Location: index.php');
-        $error = 'Credenciales incorrectas.';
-        exit;
-    }
+        $error = 'Credenciales incorrectas. ';
+    }else{
+        // Obtener los datos del usuario
+        $usuario = abreConexion($username);
 
-    // Obtener los datos del usuario
-    $usuario = abreConexion($username);
+        if(!$usuario){
+            $error = "Credenciales incorrectas";
+        }else{
+            // Verificar si la contraseña es correcta
+            if (password_verify($password, $usuario['password'])) {
+                error_log("Contraseña verificada");
 
-    // Verificar si la contraseña es correcta
-    if (password_verify($password, $usuario['usuario_passwd'])) {
-        // Iniciar sesión
-        session_start();
-        $_SESSION['usuario'] = $username;
-        $_SESSION['role'] = $usuario['role'];
+                session_start();
+                // Iniciar sesión
+                $_SESSION['usuario'] = $username;
+                $_SESSION['role'] = $usuario['role'];
 
-        // Redirigir según el rol del usuario
-        if ($usuario['role'] == 'USER') {
-            header('Location: principal.php');
-        } elseif ($usuario['role'] == 'ADMIN') {
-            header('Location: admin.php');
+                // Redirigir según el rol del usuario
+                if ($usuario['role'] == 'USER') {
+                    header('Location: principal.php');
+                } elseif ($usuario['role'] == 'ADMIN') {
+                    header('Location: admin.php');
+                }
+                exit;
+            } else {
+                $error = 'Credenciales incorrectas. ';
+            }
         }
-        exit;
-    } else {
-        $error = 'Credenciales incorrectas.';
-        exit;
     }
 }
 
-// Verificar sesión en la página principal
-if (basename($_SERVER['PHP_SELF']) == "principal.php" && !isset($_SESSION['usuario'])) {
-    header('Location: login.php');
-    $error = 'Debes iniciar sesión.';
-    exit;
-}
-
-// Verificar acceso a admin.php
-if (basename($_SERVER['PHP_SELF']) == "admin.php" && (!isset($_SESSION['role']) || $_SESSION['role'] != 'ADMIN')) {
-    header('Location: no-autorizado.php');
-    exit;
-}
 ?>
 
 <!DOCTYPE html>

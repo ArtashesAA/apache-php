@@ -13,8 +13,9 @@
 </head>
 <body>
     <div class="container">
-        <h2>Administrador</h2>
-        <p>Bienvenido</p>
+        <h2>Bienvenido</h2>
+        <p>Eres Administrador</p>
     </div>
+    <a href="logout.php">Cerrar sesión</a>
 </body>
 </html>

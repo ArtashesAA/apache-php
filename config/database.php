@@ -7,7 +7,7 @@
 
         $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
         
-        $query = "INSERT INTO usuarios (`username`, `password`, `role`) VALUES (?, ?, ?)";
+        $query = "INSERT INTO usuarios (username, password, role) VALUES (?, ?, ?)";
             
         try {
             $stmt = $pdo->prepare($query);
@@ -23,7 +23,7 @@
     // Verificar si el usuario ya existe
     function userExiste($username) {
         global $pdo;
-        $query = 'SELECT usuario FROM usuarios WHERE username = ?';
+        $query = 'SELECT username FROM usuarios WHERE username = ?';
         $stmt = $pdo->prepare($query);
         $stmt->execute([$username]);
         return $stmt->fetch() ? true : false;
@@ -35,7 +35,9 @@
         $query = 'SELECT * FROM usuarios WHERE username = ?';
         $stmt = $pdo->prepare($query);
         $stmt->execute([$username]);
-        return $stmt->fetch();
+        $usuario = $stmt->fetch();
+
+        return $usuario;
     }
 
 ?>
