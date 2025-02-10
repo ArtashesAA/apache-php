@@ -1,8 +1,6 @@
 <?php
     require '../config/pdo.php';
     
-    session_start();
-
     function comprobarAutenticacion() {
         if (!isset($_SESSION['username'])) {
             return false;

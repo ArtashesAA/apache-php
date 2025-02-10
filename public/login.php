@@ -7,7 +7,7 @@ $error = '';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Obtener y sanitizar las credenciales del formulario
     $username = htmlspecialchars($_POST['username']);
-    $password = $_POST['password'];
+    $password = htmlspecialchars($_POST['password']);
 
     // Verificar si el usuario existe
     if (!userExiste($username)) {
@@ -15,6 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }else{
         // Obtener los datos del usuario
         $usuario = abreConexion($username);
+        $hash_bd = $usuario['password'];
 
         if(!$usuario){
             $error = "Credenciales incorrectas";
@@ -23,23 +24,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (password_verify($password, $usuario['password'])) {
                 error_log("Contraseña verificada");
 
-                session_start();
-                // Iniciar sesión
-                $_SESSION['usuario'] = $username;
-                $_SESSION['role'] = $usuario['role'];
-
-                // Redirigir según el rol del usuario
-                if ($usuario['role'] == 'USER') {
-                    header('Location: principal.php');
-                } elseif ($usuario['role'] == 'ADMIN') {
-                    header('Location: admin.php');
-                }
-                exit;
+                
             } else {
                 $error = 'Credenciales incorrectas. ';
             }
         }
     }
+}
+
+function iniciarSesion($usuario){
+    session_start();
+    // Iniciar sesión
+    $_SESSION['username'] = $usuario['username'];
+    $_SESSION['role'] = $usuario['role'];
+
+    // Redirigir según el rol del usuario
+    if ($usuario['role'] == 'USER') {
+        header('Location: principal.php');
+    } elseif ($usuario['role'] == 'ADMIN') {
+        header('Location: admin.php');
+    }
+    exit;
+}
+
+function actualizarPassword($username, $nuevo_hash){
+    global $pdo;
+    $query = "UPDATE usuarios SET password = ? WHERE username = ?";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$nuevo_hash, $username]);
 }
 
 ?>
@@ -64,5 +76,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <button type="submit" class="button">Iniciar sesión</button>
         </form>
     </div>
+    <a href="registro.php">Registrate</a>
 </body>
 </html>

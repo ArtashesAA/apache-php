@@ -40,6 +40,8 @@
             <input type="password" name="password" class="input-field" placeholder="Contraseña" required>
             <button type="submit" class="button">Registrar</button>
         </form>
+        
     </div>
+    <a href="login.php">Iniciar sesión</a>
 </body>
 </html>
